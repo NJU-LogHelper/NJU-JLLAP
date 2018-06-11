@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templateSet group="LogHelp">
+    <template id="LogHelper-logh"
+              name="logh"
+              value="$LOGGER$.$LOGMETHOD$&quot;$END$&quot;);"
+              description="Logs a trace message"
+              toReformat="true"
+              toShortenFQNames="true">
+
+        <variable name="LOGGER"
+                  expression="resolveLoggerInstance"
+                  defaultValue="log"
+                  alwaysStopAt="false"/>
+        <variable name="LOGMETHOD"
+                  expression="resolveLogMethod(LOGGER, &quot;trace&quot;)"
+                  defaultValue="trace("
+                  alwaysStopAt="false"/>
+
+        <context>
+            <option name="JAVA_CODE" value="true"/>
+            <option name="JAVA_COMMENT" value="false"/>
+            <option name="JAVA_STRING" value="false"/>
+            <option name="XML" value="false"/>
+            <option name="HTML" value="false"/>
+            <option name="JSP" value="false"/>
+            <option name="COMPLETION" value="false"/>
+            <option name="GROOVY" value="false"/>
+            <option name="OTHER" value="false"/>
+        </context>
+    </template>
+
+    <template id="LogHelper-logd" name="logd"
+              value="$LOGGER$.$LOGMETHOD$&quot;$END$&quot;);"
+              description="Logs a debug message" toReformat="true" toShortenFQNames="true">
+
+        <variable name="LOGGER" expression="resolveLoggerInstance"
+                  defaultValue="log" alwaysStopAt="false"/>
+        <variable name="LOGMETHOD" expression="resolveLogMethod(LOGGER, &quot;debug&quot;)"
+                  defaultValue="debug(" alwaysStopAt="false"/>
+
+        <context>
+            <option name="JAVA_CODE" value="true"/>
+            <option name="JAVA_COMMENT" value="false"/>
+            <option name="JAVA_STRING" value="false"/>
+            <option name="XML" value="false"/>
+            <option name="HTML" value="false"/>
+            <option name="JSP" value="false"/>
+            <option name="COMPLETION" value="false"/>
+            <option name="GROOVY" value="false"/>
+            <option name="OTHER" value="false"/>
+        </context>
+    </template>
+
+    <template id="LogHelper-logi" name="logi"
+              value="$LOGGER$.$LOGMETHOD$&quot;$END$&quot;);"
+              description="Logs an info message" toReformat="true" toShortenFQNames="true">
+
+        <variable name="LOGGER" expression="resolveLoggerInstance"
+                  defaultValue="log" alwaysStopAt="false"/>
+        <variable name="LOGMETHOD" expression="resolveLogMethod(LOGGER, &quot;info&quot;)"
+                  defaultValue="info(" alwaysStopAt="false"/>
+
+        <context>
+            <option name="JAVA_CODE" value="true"/>
+            <option name="JAVA_COMMENT" value="false"/>
+            <option name="JAVA_STRING" value="false"/>
+            <option name="XML" value="false"/>
+            <option name="HTML" value="false"/>
+            <option name="JSP" value="false"/>
+            <option name="COMPLETION" value="false"/>
+            <option name="GROOVY" value="false"/>
+            <option name="OTHER" value="false"/>
+        </context>
+    </template>
+
+    <template id="LogHelper-logw" name="logw"
+              value="$LOGGER$.$LOGMETHOD$&quot;$END$&quot;);"
+              description="Logs a warning message" toReformat="true" toShortenFQNames="true">
+
+        <variable name="LOGGER" expression="resolveLoggerInstance"
+                  defaultValue="log" alwaysStopAt="false"/>
+        <variable name="LOGMETHOD" expression="resolveLogMethod(LOGGER, &quot;warn&quot;)"
+                  defaultValue="warn(" alwaysStopAt="false"/>
+
+        <context>
+            <option name="JAVA_CODE" value="true"/>
+            <option name="JAVA_COMMENT" value="false"/>
+            <option name="JAVA_STRING" value="false"/>
+            <option name="XML" value="false"/>
+            <option name="HTML" value="false"/>
+            <option name="JSP" value="false"/>
+            <option name="COMPLETION" value="false"/>
+            <option name="GROOVY" value="false"/>
+            <option name="OTHER" value="false"/>
+        </context>
+    </template>
+
+    <template id="LogHelper-loge" name="loge"
+              value="$LOGGER$.$LOGMETHOD$&quot;$END$&quot;);"
+              description="Logs an error message" toReformat="true" toShortenFQNames="true">
+
+        <variable name="LOGGER" expression="resolveLoggerInstance"
+                  defaultValue="log" alwaysStopAt="false"/>
+        <variable name="LOGMETHOD" expression="resolveLogMethod(LOGGER, &quot;error&quot;)"
+                  defaultValue="error(" alwaysStopAt="false"/>
+
+        <context>
+            <option name="JAVA_CODE" value="true"/>
+            <option name="JAVA_COMMENT" value="false"/>
+            <option name="JAVA_STRING" value="false"/>
+            <option name="XML" value="false"/>
+            <option name="HTML" value="false"/>
+            <option name="JSP" value="false"/>
+            <option name="COMPLETION" value="false"/>
+            <option name="GROOVY" value="false"/>
+            <option name="OTHER" value="false"/>
+        </context>
+    </template>
+</templateSet>

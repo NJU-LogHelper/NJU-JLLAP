@@ -1,0 +1,4 @@
+214: SongLing Dong, debug, IfStmt, logger.debug("Ignoring invalid jsonp parameter value: " + value);
+70: SongLing Dong, debug, IfStmt, logger.debug("Invalid jsonp parameter value:" + callbackMethodName);
+45: mozhu, info, MethodDeclaration, logger.info(result);
+31: yixian, info, MethodDeclaration, logger.info("parsing json string:" + jsonString);

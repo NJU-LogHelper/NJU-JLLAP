@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="GBK" standalone="yes"?>
+<list>
+    <LogContext>
+        <defaultLogLevel>error</defaultLogLevel>
+        <descriptionTemplate>description1</descriptionTemplate>
+        <logTemplate>template1</logTemplate>
+        <quickFixName>quickfix1</quickFixName>
+        <typeName>CatchClause</typeName>
+    </LogContext>
+    <LogContext>
+        <defaultLogLevel>info</defaultLogLevel>
+        <descriptionTemplate>description2</descriptionTemplate>
+        <keyWords>
+            <keyWord>aaa</keyWord>
+            <keyWord>bbb</keyWord>
+        </keyWords>
+        <logTemplate>template2</logTemplate>
+        <quickFixName>quickfix2</quickFixName>
+        <typeName>MethodDeclaration</typeName>
+    </LogContext>
+    <LogContext>
+        <defaultLogLevel>trace</defaultLogLevel>
+        <descriptionTemplate>description1</descriptionTemplate>
+        <keyWords>
+            <keyWord>hhh</keyWord>
+            <keyWord>hehehe</keyWord>
+        </keyWords>
+        <logTemplate>template1</logTemplate>
+        <quickFixName>quickfix1</quickFixName>
+        <typeName>IfStmt</typeName>
+    </LogContext>
+</list>

@@ -1,0 +1,6 @@
+43: Martin Thompson, SEVERE, MethodDeclaration, logger.log(Level.SEVERE, "Exception processing: " + sequence + " " + event, ex);
+51: Martin Thompson, SEVERE, MethodDeclaration, logger.log(Level.SEVERE, "Exception during onStart()", ex);
+57: Martin Thompson, SEVERE, MethodDeclaration, logger.log(Level.SEVERE, "Exception during onShutdown()", ex);
+43: Martin Thompson, INFO, MethodDeclaration, logger.log(Level.INFO, "Exception processing: " + sequence + " " + event, ex);
+49: Martin Thompson, INFO, MethodDeclaration, logger.log(Level.INFO, "Exception during onStart()", ex);
+55: Martin Thompson, INFO, MethodDeclaration, logger.log(Level.INFO, "Exception during onShutdown()", ex);

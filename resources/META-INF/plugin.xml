@@ -1,0 +1,45 @@
+<idea-plugin>
+  <id>nju.edu.xdb.LogHelper</id>
+  <name>LogHelper</name>
+  <version>1.2</version>
+  <vendor email="772360893@qq.com" url="www.nju.edu.com">NJU</vendor>
+
+  <description><![CDATA[
+      Enter short description for your plugin here.<br>
+      <em>most HTML tags may be used</em>
+    ]]></description>
+
+  <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="145.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+    <inspectionToolProvider implementation="edu.nju.codeInspection.InspectionProvider"/>
+    <liveTemplateMacro implementation="edu.nju.livetemplates.ResolveLoggerInstance"/>
+    <liveTemplateMacro implementation="edu.nju.livetemplates.ResolveLogMethod"/>
+    <defaultLiveTemplatesProvider implementation="edu.nju.livetemplates.TemplatesProvider"/>
+    <liveTemplateOptionalProcessor implementation="edu.nju.livetemplates.TemplatePostProcessor"/>
+    <inspectionToolProvider implementation="edu.nju.codeInspection.InspectionProvider"/>
+    <applicationService  serviceImplementation="edu.nju.config.persist.service.LogHelperProjectService"/>
+    <applicationConfigurable  instance="edu.nju.config.Form.LogHelperProjectConfigurable"/>
+  </extensions>
+
+  <actions>
+    <action class="edu.nju.actions.CriticalInspectionConfigAction" id="plugintest" text="My plugin" description="a plugin" icon="/icons/icon.png">
+      <add-to-group group-id="MainToolBar" anchor="last"/>
+    </action>
+  </actions>
+
+</idea-plugin>
