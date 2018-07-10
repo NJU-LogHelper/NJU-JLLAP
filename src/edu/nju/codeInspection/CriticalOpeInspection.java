@@ -69,7 +69,7 @@ public class CriticalOpeInspection extends BaseJavaLocalInspectionTool {
     //对应的html
     @NotNull
     public String getShortName() {
-        return "CriticalOperationLogging";
+        return "CriticalOpeLogging";
     }
 
 

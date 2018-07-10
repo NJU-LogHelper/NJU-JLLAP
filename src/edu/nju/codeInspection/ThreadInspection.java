@@ -55,7 +55,7 @@ public class ThreadInspection extends BaseJavaLocalInspectionTool {
     @NotNull
     public String getDisplayName() {
 
-        return "thread operation should be logged";
+        return "Thread operation should be logged";
     }
 
     @NotNull

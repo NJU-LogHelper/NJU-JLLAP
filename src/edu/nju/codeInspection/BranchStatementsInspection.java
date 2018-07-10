@@ -86,7 +86,7 @@ public class BranchStatementsInspection extends BaseJavaLocalInspectionTool {
 
     @NotNull
     public String getShortName() {
-        return "BranchStatements";
+        return "BranchLogging";
     }
 
     @NotNull

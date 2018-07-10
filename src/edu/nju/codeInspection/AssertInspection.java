@@ -27,7 +27,7 @@ public class AssertInspection extends BaseJavaLocalInspectionTool {
 
     @NotNull
     public String getShortName() {
-        return "Assert";
+        return "AssertLogging";
     }
 
     @NotNull

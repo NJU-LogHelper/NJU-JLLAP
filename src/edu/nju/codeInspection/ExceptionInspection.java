@@ -61,7 +61,7 @@ public class ExceptionInspection extends BaseJavaLocalInspectionTool {
 
     @NotNull
     public String getShortName() {
-        return "Exception";
+        return "ExceptionLogging";
     }
 
     @NotNull

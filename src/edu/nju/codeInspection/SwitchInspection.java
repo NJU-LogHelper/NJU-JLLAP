@@ -68,11 +68,11 @@ public class SwitchInspection extends BaseJavaLocalInspectionTool {
 
     @SuppressWarnings({"WeakAccess"})
     @NonNls
-    private static final String DESCRIPTION_TEMPLATE = "Switch分支需要被记录";
+    private static final String DESCRIPTION_TEMPLATE = "Switch ";
 
     @NotNull
     public String getDisplayName() {
-        return "重要switch需要记日志";
+        return "switch";
     }
 
     @NotNull
@@ -84,7 +84,7 @@ public class SwitchInspection extends BaseJavaLocalInspectionTool {
 
     @NotNull
     public String getShortName() {
-        return "Switch";
+        return "SwitchLogging";
     }
 
 

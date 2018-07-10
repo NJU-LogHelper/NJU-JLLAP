@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>nju.edu.xdb.LogHelper</id>
   <name>LogHelper</name>
-  <version>1.2</version>
+  <version>1.3</version>
   <vendor email="772360893@qq.com" url="www.nju.edu.com">NJU</vendor>
 
   <description><![CDATA[
@@ -31,6 +31,7 @@
     <liveTemplateMacro implementation="edu.nju.livetemplates.ResolveLogMethod"/>
     <defaultLiveTemplatesProvider implementation="edu.nju.livetemplates.TemplatesProvider"/>
     <liveTemplateOptionalProcessor implementation="edu.nju.livetemplates.TemplatePostProcessor"/>
+
     <inspectionToolProvider implementation="edu.nju.codeInspection.InspectionProvider"/>
     <applicationService  serviceImplementation="edu.nju.config.persist.service.LogHelperProjectService"/>
     <applicationConfigurable  instance="edu.nju.config.Form.LogHelperProjectConfigurable"/>

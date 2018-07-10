@@ -19,5 +19,6 @@
         <jarDirectory url="file://$MODULE_DIR$/resources/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="jython-standalone-2.7.0" level="project" />
   </component>
 </module>
