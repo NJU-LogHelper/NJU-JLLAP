@@ -41,6 +41,9 @@
     <action class="edu.nju.actions.CriticalInspectionConfigAction" id="plugintest" text="My plugin" description="a plugin" icon="/icons/icon.png">
       <add-to-group group-id="MainToolBar" anchor="last"/>
     </action>
+    <action id="analyze" class="edu.nju.actions.AnalyzeAction" text="Analyze Log" description="Perform log analysis.">
+      <add-to-group group-id="AnalyzeMenu" anchor="last"/>
+    </action>
   </actions>
 
 </idea-plugin>
