@@ -76,7 +76,7 @@ public class AnalyzeAction extends AnAction {
         }
 
 //        builder.append(NAMES[RULE_ASSERT]).append(": needs ").append(TOTAL_COUNT[RULE_ASSERT]).append(", but misses ").append(MISS_COUNT[RULE_ASSERT]).append(".\n");
-        builder.append(NAMES[RULE_EXCEPTION]).append(": needs ").append(TOTAL_COUNT[RULE_EXCEPTION]).append(", but misses ").append(MISS_COUNT[RULE_EXCEPTION]).append(".\n");
+//        builder.append(NAMES[RULE_EXCEPTION]).append(": needs ").append(TOTAL_COUNT[RULE_EXCEPTION]).append(", but misses ").append(MISS_COUNT[RULE_EXCEPTION]).append(".\n");
         builder.append(NAMES[RULE_CRITICAL_BRANCH]).append(": needs ").append(TOTAL_COUNT[RULE_CRITICAL_BRANCH]).append(", but misses ").append(MISS_COUNT[RULE_CRITICAL_BRANCH]).append(".\n");
 //        builder.append(NAMES[RULE_THREAD]).append(": needs ").append(TOTAL_COUNT[RULE_THREAD]).append(", but misses ").append(MISS_COUNT[RULE_THREAD]).append(".\n");
 //        builder.append(NAMES[RULE_FILE]).append(": needs ").append(TOTAL_COUNT[RULE_FILE]).append(", but misses ").append(MISS_COUNT[RULE_FILE]).append(".\n");
