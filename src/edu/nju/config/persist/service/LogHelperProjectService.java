@@ -5,7 +5,6 @@ import com.intellij.openapi.components.*;
 
 @State(name = "LogHelper", storages = {
         @Storage(
-                id = "other",
         file = "$APP_CONFIG$/LogHelper.xml"
 )
 })
