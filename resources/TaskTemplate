@@ -1,0 +1,7 @@
+1/Parsing/<TASKLOG parsing start>/<TASKLOG parsing end>
+1.1/Parsing1/<TASKLOG parsing1 start>/<TASKLOG parsing1 end>
+1.1.1/Parsing2/<TASKLOG parsing2 start>/<TASKLOG parsing2 end>
+1.1.2/Parsing3/<TASKLOG parsing3 start>/<TASKLOG parsing3 end>
+2/Logical Plan/<TASKLOG logical plan start>/<TASKLOG logical plan end>
+3/Physical Plan/<TASKLOG physical plan start>/<TASKLOG physical plan end>
+3.1/Run Job/<TASKLOG job start>/<TASKLOG job end>

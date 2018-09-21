@@ -11,10 +11,6 @@ import java.io.*;
  * Created by chentiange on 2018/5/7.
  */
 public class CriticalInspectionConfigAction extends AnAction {
-//    final String fileNameForClass = "E:\\workspace\\LogHelper\\resources\\criticalClass";
-//    final String fileNameForMethod = "E:\\workspace\\LogHelper\\resources\\criticalMethod";
-//    final String fileNameForMethod = "/Users/chentiange/Downloads/LogHelper/resources/criticalMethod";
-//    final String fileNameForClass = "/Users/chentiange/Downloads/LogHelper/resources/criticalClass";
     final String fileNameForMethod = this.getClass().getResource("/criticalMethod").getFile();
     final String fileNameForClass = this.getClass().getResource("/criticalClass").getFile();
     @Override

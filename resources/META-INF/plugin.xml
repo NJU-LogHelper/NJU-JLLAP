@@ -35,15 +35,35 @@
     <inspectionToolProvider implementation="edu.nju.codeInspection.InspectionProvider"/>
     <applicationService  serviceImplementation="edu.nju.config.persist.service.LogHelperProjectService"/>
     <applicationConfigurable  instance="edu.nju.config.Form.LogHelperProjectConfigurable"/>
+
+    <toolWindow canCloseContents="true" anchor="bottom"
+                id="ToolWindowForLogSegmentation"
+                factoryClass="edu.nju.actions.ToolWindowForLogSegmentation">
+    </toolWindow>
   </extensions>
 
   <actions>
-    <action class="edu.nju.actions.CriticalInspectionConfigAction" id="plugintest" text="My plugin" description="a plugin" icon="/icons/icon.png">
+    <action class="edu.nju.actions.CriticalInspectionConfigAction" id="plugintest" text="My plugin" description="a plugin" icon="/icons/log.png">
       <add-to-group group-id="MainToolBar" anchor="last"/>
     </action>
     <action id="analyze" class="edu.nju.actions.AnalyzeAction" text="Analyze Log" description="Perform log analysis.">
       <add-to-group group-id="AnalyzeMenu" anchor="last"/>
     </action>
+
+    <group id="TaskTemplate.PluginSet" text="TaskTemplate" description="TaskTemplate">
+      <add-to-group group-id="MainMenu" anchor="last"  />
+      <action id="TaskTemplateConfig" class="edu.nju.actions.TaskTemplateConfigAction" text="TaskTemplateConfig"
+              description="TaskTemplateConfig" />
+      <action id="LogFileConfig" class="edu.nju.actions.LogFileConfigAction" text="LogFileConfig"
+            description="LogFileConfig"/>
+      <action id="LogSegmentation" class="edu.nju.actions.LogSegmentationAction" text="LogSegmentation"
+              description="LogSegmentation"/>
+    </group>
+
+
   </actions>
+
+
+
 
 </idea-plugin>
