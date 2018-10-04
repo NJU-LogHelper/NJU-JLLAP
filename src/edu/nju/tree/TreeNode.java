@@ -69,7 +69,6 @@ public class TreeNode<T> implements Serializable {
 //            System.out.println(task.getTaskId()+" "+task.getTaskName()+" "+task.getTaskStatus().getStr()+" "+task.getLogs().size());
 //            System.out.println(this.getShowNode().getParent()+" "+this.getShowNode().getUserObject());
 
-            System.out.println(fatherNode.getContent()+" "+task.getTaskId());
         }
 
         if (!this.childrenList.isEmpty()){

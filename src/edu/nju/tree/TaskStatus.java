@@ -2,7 +2,7 @@ package edu.nju.tree;
 
 public enum TaskStatus {
 
-    PRE_LOSS(0,"pre patten loss"),POST_LOSS(1,"post patten loss"),ERROR(2,"task error"),NORMAL(3,"task normal");
+    PRE_LOSS(0,"Pre patten loss"),POST_LOSS(1,"Post patten loss"),ERROR(2,"Task error"),NORMAL(3,"Task normal");
 
     private int value;
 

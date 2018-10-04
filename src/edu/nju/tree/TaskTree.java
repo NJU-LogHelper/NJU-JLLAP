@@ -20,61 +20,25 @@ public class TaskTree {
         try {
             FileReader fileReader = new FileReader(new File(path));
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            TreeNode current = root;
+            TreeNode father = root;
             TreeNode child;
 
             String line = bufferedReader.readLine();
 
             while (line != null){
 
-                String [] strArray = line.split("/");
-                String taskId = strArray[0];
-                String taskName = strArray[1];
-                String prePatten = strArray[2];
-                String postPatten = strArray[3];
-                Task newTask = new Task(taskId,taskName,prePatten,postPatten);
-
-                //null和1
-                if(current.getContent() == null){
-                    child = new TreeNode(current,newTask);
-                    current.addChild(child);
-                    System.out.println("1"+current.getContent()+" "+child.getContent());
-                    current = child;
-                    System.out.println("1"+current.getContent()+" "+child.getContent());
+                if (line.indexOf("tasks:")!=-1){
+                    father = (TreeNode) father.getChildrenList().get(father.getChildrenList().size()-1);
                     line = bufferedReader.readLine();
-                    continue;
                 }
 
-                Task currentTask = (Task) current.getContent();
-                String [] currentTaskIdArray = currentTask.getTaskId().split("\\.");
-                String [] taskIdArray = taskId.split("\\.");
-
-                //1和1.1
-//                System.out.println("2 "+currentTask.getTaskId()+" "+taskId);
-//                System.out.println("2 "+currentTaskIdArray.length+" "+taskIdArray.length);
-//                System.out.println("2 "+currentTask.getTaskId()+" "+taskId.substring(0,taskId.lastIndexOf('.')));
-                if(currentTaskIdArray.length+1 == taskIdArray.length && currentTask.getTaskId().equals(taskId.substring(0,taskId.lastIndexOf('.')))){
-                    child = new TreeNode(current,newTask);
-                    current.addChild(child);
-                    System.out.println("2"+current.getContent()+" "+child.getContent());
-                    current = child;
-                    System.out.println("2"+current.getContent()+" "+child.getContent());
-                    line = bufferedReader.readLine();
-                    continue;
+                if(line.indexOf("name:")!=-1){
+                    String nextLine = bufferedReader.readLine();
+                    String nextNextLine = bufferedReader.readLine();
+                    Task newTask = new Task(line.split("name:")[1],nextLine.split("pre:")[1],nextNextLine.split("post:")[1]);
+                    child = new TreeNode(father,newTask);
+                    father.addChild(child);
                 }
-
-                //1.1.1和2
-                int backTime = currentTaskIdArray.length-taskIdArray.length+1;
-                for (int i = 0; i < backTime; i++) {
-                    current = current.getFatherNode();
-                }
-
-                child = new TreeNode(current,newTask);
-                current.addChild(child);
-                System.out.println("3"+current.getContent()+" "+child.getContent());
-                current = child;
-                System.out.println("3"+current.getContent()+" "+child.getContent());
-
                 line = bufferedReader.readLine();
             }
 
@@ -140,8 +104,9 @@ public class TaskTree {
                         currentTask.setTaskStatus(TaskStatus.POST_LOSS);
                     }else {
                         currentTask.setLogs(logList);
-                        if (isError) currentTask.setTaskStatus(TaskStatus.ERROR);
                     }
+
+                    if (isError) currentTask.setTaskStatus(TaskStatus.ERROR);
                 }
 
 
@@ -151,7 +116,6 @@ public class TaskTree {
                         treeStack.push((TreeNode) list.get(i));
                     }
                 }
-
             }
 
 
@@ -177,7 +141,7 @@ public class TaskTree {
 
             if (current.getContent() != null) {
                 Task task = (Task) current.getContent();
-                current.getShowNode().setUserObject(task.getTaskId()+" "+task.getTaskName()+" "+task.getTaskStatus());
+                current.getShowNode().setUserObject(task.getTaskName()+"---"+task.getTaskStatus().getStr());
             }
             List list = current.getChildrenList();
             if (!list.isEmpty()) {

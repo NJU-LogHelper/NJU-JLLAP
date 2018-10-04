@@ -6,7 +6,6 @@ import java.util.List;
 
 public class Task implements Serializable{
 
-    private String taskId;
 
     private String taskName;
 
@@ -19,21 +18,13 @@ public class Task implements Serializable{
     private TaskStatus taskStatus;
 
 
-    public Task(String taskId, String taskName, String prePatten, String postPatten) {
-        this.taskId = taskId;
+    public Task(String taskName, String prePatten, String postPatten) {
+
         this.taskName = taskName;
         this.prePatten = prePatten;
         this.postPatten = postPatten;
         this.logs = new ArrayList<>();
         this.taskStatus = TaskStatus.NORMAL;
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
     }
 
     public String getTaskName() {

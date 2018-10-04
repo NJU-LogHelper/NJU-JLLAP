@@ -19,7 +19,11 @@ public class BranchStatementLoggingUtil {
             //获取分支主元素
             PsiIfStatement ifStatement = (PsiIfStatement) binaryExpression.getParent();
 
+
             //暂时支持单层的if-else
+
+
+
             PsiBlockStatement ifBlock = (PsiBlockStatement) binaryExpression.getNextSibling().getNextSibling();
             PsiBlockStatement elseBlock = (PsiBlockStatement)ifStatement.getLastChild();
 
