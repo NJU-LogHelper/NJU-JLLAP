@@ -30,7 +30,7 @@ import java.util.Objects;
 public class ExceptionInspection extends BaseJavaLocalInspectionTool {
 
     private final LocalQuickFix exceptionJavaConfigQuickfix = new ExceptionJavaConfigQuickfix();
-    private final LocalQuickFix exceptionJavaInfoQuickfix= new ExceptionJavaInfoQuickfix();
+    private final LocalQuickFix exceptionJavaInfoQuickfix = new ExceptionJavaInfoQuickfix();
     private final LocalQuickFix exceptionJavaFineQuickfix = new ExceptionJavaFineQuickfix();
     private final LocalQuickFix exceptionJavaFinerQuickfix = new ExceptionJavaFinerQuickfix();
     private final LocalQuickFix exceptionJavaFinestQuickfix = new ExceptionJavaFinestQuickfix();
@@ -44,14 +44,13 @@ public class ExceptionInspection extends BaseJavaLocalInspectionTool {
     private final LocalQuickFix exceptionSlf4jWarnQuickfix = new ExceptionSlf4jWarnQuickfix();
 
 
-
     @SuppressWarnings({"WeakAccess"})
     @NonNls
-    private static final String DESCRIPTION_TEMPLATE = "Catch到异常,需要输出log";
+    private static final String DESCRIPTION_TEMPLATE = "Exception caught, logging is needed.";
 
     @NotNull
     public String getDisplayName() {
-        return "Catch到的异常";
+        return "Exception caught";
     }
 
     @NotNull
@@ -68,10 +67,6 @@ public class ExceptionInspection extends BaseJavaLocalInspectionTool {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
         return new JavaElementVisitor() {
-            @Override
-            public void visitReferenceExpression(PsiReferenceExpression psiReferenceExpression) {
-            }
-
 
             @Override
             public void visitCatchSection(PsiCatchSection section) {
@@ -81,25 +76,12 @@ public class ExceptionInspection extends BaseJavaLocalInspectionTool {
                     return;
                 }
                 PsiStatement[] psiStatements = psiCodeBlock.getStatements();
-                if (psiStatements.length != 0) {
-                    for (PsiStatement psiStatement : psiStatements) {
-                        //判断是否有log语句
-                        if (psiStatement instanceof PsiExpressionStatement) {
-                            PsiExpression expression = ((PsiExpressionStatement) psiStatement).getExpression();
-                            if (expression instanceof PsiMethodCallExpression) {
-                                if (Objects.requireNonNull(((PsiMethodCallExpression) expression).getMethodExpression().getQualifierExpression()).getText().equals("log")) {
-                                    return;
-                                }
-                            }
-                        }
+                if (InspectionUtils.isNotLogged(psiStatements)) {
+                    List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ExceptionInspection", "catch", "exception");
+                    for (LocalQuickFix quickFix : quickFixes) {
+                        holder.registerProblem(section, DESCRIPTION_TEMPLATE, quickFix);
                     }
                 }
-                List<LocalQuickFix> quickFixes = LevelSequenceUtil.getQuickfixSequence("edu.nju.codeInspection.ExceptionInspection","catch","exception");
-                for (int i = 0;i<quickFixes.size();++i){
-                    LocalQuickFix quickFix = quickFixes.get(i);
-                    holder.registerProblem(section,DESCRIPTION_TEMPLATE,quickFix);
-                }
-
             }
         };
     }

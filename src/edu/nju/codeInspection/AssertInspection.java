@@ -13,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 public class AssertInspection extends BaseJavaLocalInspectionTool {
     @SuppressWarnings({"WeakAccess"})
     @NonNls
-    private static final String DESCRIPTION_TEMPLATE = "assert后需要输出描述信息";
+    private static final String DESCRIPTION_TEMPLATE = "Assert description is needed.";
 
     @NotNull
     public String getDisplayName() {
-        return "assert判断";
+        return "Assert Check";
     }
 
     @NotNull
@@ -34,9 +34,6 @@ public class AssertInspection extends BaseJavaLocalInspectionTool {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
         return new JavaElementVisitor() {
-            @Override
-            public void visitReferenceExpression(PsiReferenceExpression psiReferenceExpression) {
-            }
 
             @Override
             public void visitAssertStatement(PsiAssertStatement statement) {

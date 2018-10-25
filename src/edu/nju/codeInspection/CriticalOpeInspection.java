@@ -97,20 +97,20 @@ public class CriticalOpeInspection extends BaseJavaLocalInspectionTool {
                     line = bufferedReader.readLine();
                     while (line != null){
                         String currentClassWholeName = LoggingUtil.getCurrentClassWholeName(aClass);
-                        if (Pattern.matches(line,currentClassWholeName)){
-                            //get all method
-                            PsiMethod[] methods = aClass.getMethods();
-                            for (PsiMethod method:methods){
-                                if (!method.getName().equals("main")) {
-                                    visitMethodInClass(method);
+                        if (currentClassWholeName != null) {
+                            if (Pattern.matches(line, currentClassWholeName)) {
+                                //get all method
+                                PsiMethod[] methods = aClass.getMethods();
+                                for (PsiMethod method : methods) {
+                                    if (!method.getName().equals("main")) {
+                                        visitMethodInClass(method);
+                                    }
                                 }
                             }
                         }
                         line = bufferedReader.readLine();
                     }
                     bufferedReader.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

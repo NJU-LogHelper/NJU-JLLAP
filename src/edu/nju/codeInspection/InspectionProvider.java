@@ -1,11 +1,13 @@
 package edu.nju.codeInspection;
 
 import com.intellij.codeInspection.InspectionToolProvider;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author max
  */
 public class InspectionProvider implements InspectionToolProvider {
+    @NotNull
     public Class[] getInspectionClasses() {
         return new Class[]{
                 AssertInspection.class,

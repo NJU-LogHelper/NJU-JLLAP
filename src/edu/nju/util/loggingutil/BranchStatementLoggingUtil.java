@@ -13,19 +13,14 @@ public class BranchStatementLoggingUtil {
     public static void doBranchLogging(@NotNull Project project, @NotNull ProblemDescriptor descriptor, LoggingType type, Object level, int typeId) {
         try {
 
-            //获取当下的元素
-            PsiBinaryExpression binaryExpression = (PsiBinaryExpression) descriptor.getPsiElement();
-
             //获取分支主元素
-            PsiIfStatement ifStatement = (PsiIfStatement) binaryExpression.getParent();
+            PsiIfStatement ifStatement = (PsiIfStatement) descriptor.getPsiElement();
 
 
             //暂时支持单层的if-else
 
-
-
-            PsiBlockStatement ifBlock = (PsiBlockStatement) binaryExpression.getNextSibling().getNextSibling();
-            PsiBlockStatement elseBlock = (PsiBlockStatement)ifStatement.getLastChild();
+            PsiBlockStatement ifBlock = (PsiBlockStatement) ifStatement.getThenBranch();
+            PsiBlockStatement elseBlock = (PsiBlockStatement)ifStatement.getElseBranch();
 
             LogPsiBlockStatement(ifBlock,project,level,typeId);
             LogPsiBlockStatement(elseBlock,project,level,typeId);
