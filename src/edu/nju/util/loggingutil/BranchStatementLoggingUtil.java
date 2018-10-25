@@ -14,16 +14,14 @@ public class BranchStatementLoggingUtil {
         try {
 
             //获取分支主元素
-            PsiIfStatement ifStatement = (PsiIfStatement) descriptor.getPsiElement();
-
+            PsiIfStatement ifStatement = (PsiIfStatement) descriptor.getPsiElement().getParent();
 
             //暂时支持单层的if-else
-
             PsiBlockStatement ifBlock = (PsiBlockStatement) ifStatement.getThenBranch();
-            PsiBlockStatement elseBlock = (PsiBlockStatement)ifStatement.getElseBranch();
+            PsiBlockStatement elseBlock = (PsiBlockStatement) ifStatement.getElseBranch();
 
-            LogPsiBlockStatement(ifBlock,project,level,typeId);
-            LogPsiBlockStatement(elseBlock,project,level,typeId);
+            LogPsiBlockStatement(ifBlock, project, level, typeId);
+            LogPsiBlockStatement(elseBlock, project, level, typeId);
 
         } catch (IncorrectOperationException e) {
             LOG.error(e);
@@ -31,31 +29,23 @@ public class BranchStatementLoggingUtil {
     }
 
 
-    private static void LogPsiBlockStatement(PsiBlockStatement psiBlockStatement,Project project,Object level,int typeId){
-
-        PsiCodeBlock psiCodeBlock = psiBlockStatement.getCodeBlock();
+    private static void LogPsiBlockStatement(PsiBlockStatement psiBlockStatement, Project project, Object level, int typeId) {
+        if (psiBlockStatement == null) {
+            return;
+        }
         PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
         String levelString = LoggingUtil.getLevelStringById(level, typeId);
-        String stmt="enter please_enter_your_branch_name";
-        String logContent = String.format("%s %s %s\");","log.",levelString,stmt);
+        String stmt = "your_log_msg";
+        String logContent = String.format("%s %s%s\");", "log.", levelString, stmt);
 
-        PsiExpressionStatement logCall = (PsiExpressionStatement) factory.createStatementFromText(logContent,null);
+        PsiExpressionStatement logCall = (PsiExpressionStatement) factory.createStatementFromText(logContent, null);
 
-        //如果有log分支，则不打印
-        if(psiCodeBlock==null){
-            LOG.error("psiCodeBlock is null");
-        } else{
-            /**
-             * 如果block里面为空则无法插入
-             * 修复
-             */
-//            PsiStatement psiStatement=psiCodeBlock.getStatements()[0];
-            PsiStatement []psiStatements=psiCodeBlock.getStatements();
-            if(psiStatements.length!=0){
-                psiCodeBlock.addBefore(logCall,psiStatements[0]);
-            }
-            psiCodeBlock.add(logCall);
+        PsiCodeBlock psiCodeBlock = psiBlockStatement.getCodeBlock();
+        PsiStatement[] psiStatements = psiCodeBlock.getStatements();
+        if (psiStatements.length != 0) {
+            psiCodeBlock.addBefore(logCall, psiStatements[0]);
         }
+        psiCodeBlock.add(logCall);
     }
 
 }
