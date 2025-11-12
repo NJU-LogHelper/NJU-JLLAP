@@ -7,50 +7,42 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
-
+//日志工具：判断语句是否已打日志，获取类全名，根据日志框架类型输出对应级别字符串
 /**
  * Created by chentiange on 2018/5/6.
- * 为 JDBC 连接语句自动添加日志记录
  */
 public class JDBCConnectionLoggingUtil {
     private static final Logger LOG = Logger.getInstance("#com.intellij.codeInspection.inspections.JDBCInspection");
-
-    /**
-     * 在 JDBC 获取连接处插入日志语句
-     */
-    public static void doJDBCLogging(@NotNull Project project,
-                                     @NotNull ProblemDescriptor problemDescriptor,
-                                     LoggingType type,
-                                     Object level,
-                                     int typeId) {
+    public static void doJDBCLogging(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor, LoggingType type, Object level, int typeId){
         try {
-            // 取出形如 conn = DriverManager.getConnection(url, user, pwd);
-            PsiAssignmentExpression assignmentExpression =
-                    (PsiAssignmentExpression) problemDescriptor.getPsiElement();
+            PsiAssignmentExpression assignmentExpression = (PsiAssignmentExpression) problemDescriptor.getPsiElement();
+            final PsiMethodCallExpression rGetConn = (PsiMethodCallExpression) assignmentExpression.getRExpression();
+            final PsiExpressionList expressionList = rGetConn.getArgumentList();
+            final PsiExpression[] expressions = expressionList.getExpressions();
+            String url = expressions[0].getText();
+            String user = expressions[1].getText();
+            String password = expressions[2].getText();
 
-            PsiMethodCallExpression rGetConn =
-                    (PsiMethodCallExpression) assignmentExpression.getRExpression();
-            PsiExpression[] args = rGetConn.getArgumentList().getExpressions();
+//            final PsiElement semicolon = assignmentExpression.getNextSibling();
 
-            String url = args[0].getText();
-            String user = args[1].getText();
-            String password = args[2].getText();
-
-            // 构造日志语句：log.xxx("JDBC connecting with url: "...)
             PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
-            String levelStr = LoggingUtil.getLevelStringById(level, typeId);
-            String logContent = String.format(
-                    "log.%s(\"JDBC connecting with url:\" + %s + \" user:\" + %s + \" password:\" + %s);",
-                    levelStr, url, user, password);
+            //get current class
+            final PsiClass currentFileClass = PsiTreeUtil.getParentOfType(assignmentExpression, PsiClass.class);
+            final String currentFileClassName = currentFileClass.getName();
+            String levelString = LoggingUtil.getLevelStringById(level,typeId);
+            String logContent = String.format("%s%s  JDBC connecting with url:\"+ %s +\" user: \"+ %s+\" password: \"+%s);","log.", levelString,url,user,password);
+//            PsiMethodCallExpression logCall =
+//                    (PsiMethodCallExpression) factory.createExpressionFromText(logContent, null);
+//            logCall.addAfter(semicolon,logCall);
+//            assignmentExpression.addAfter(logCall,assignmentExpression.getParent());
+            PsiExpressionStatement logstmt = (PsiExpressionStatement) factory.createStatementFromText(logContent,null);
+            assignmentExpression.getParent().getNextSibling().replace(logstmt);
+//            (logstmt,assignmentExpressionon.getParent());
 
-            PsiExpressionStatement logStmt =
-                    (PsiExpressionStatement) factory.createStatementFromText(logContent, null);
-
-            // 把日志语句插到原赋值语句的下一行
-            assignmentExpression.getParent().getNextSibling().replace(logStmt);
 
         } catch (IncorrectOperationException e) {
             LOG.error(e);
         }
+
     }
 }
