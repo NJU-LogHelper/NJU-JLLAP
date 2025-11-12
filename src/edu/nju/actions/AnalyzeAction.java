@@ -23,24 +23,44 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+/**
+ * 代码分析Action
+ * 分析Java代码中各种关键位置的日志记录情况，检查是否存在缺失的日志记录
+ * 支持的检查规则包括：断言、异常、关键分支、线程、文件、服务器、数据库、关键类和方法
+ * 
+ * @author NJU
+ */
 public class AnalyzeAction extends AnAction {
 
+    /** 当前项目 */
     private Project project;
 
+    /** 日志记录器 */
     private final Logger logger = Logger.getInstance(this.getClass());
 
+    /** 关键方法配置文件路径 */
     private final String criticalMethodsFile = this.getClass().getResource("/criticalMethod").getFile();
+    /** 关键类配置文件路径 */
     private final String criticalClassesFile = this.getClass().getResource("/criticalClass").getFile();
 
+    /** 规则类型：断言日志 */
     private static final int RULE_ASSERT = 0;
+    /** 规则类型：异常日志 */
     private static final int RULE_EXCEPTION = 1;
+    /** 规则类型：关键分支日志 */
     private static final int RULE_CRITICAL_BRANCH = 2;
+    /** 规则类型：线程日志 */
     private static final int RULE_THREAD = 3;
+    /** 规则类型：文件日志 */
     private static final int RULE_FILE = 4;
+    /** 规则类型：服务器日志 */
     private static final int RULE_SERVER = 5;
+    /** 规则类型：数据库日志 */
     private static final int RULE_DATABASE = 6;
+    /** 规则类型：关键类和方法日志 */
     private static final int RULE_CRITICAL_CLASSES_AND_METHODS = 7;
 
+    /** 规则名称数组 */
     private static final String[] NAMES = {
             "Assert Log",
             "Exception Log",
@@ -52,17 +72,27 @@ public class AnalyzeAction extends AnAction {
             "Critical Classes and Methods Log"
     };
 
+    /** 各规则类型的总计数数组 */
     private static final int[] TOTAL_COUNT = {0, 0, 0, 0, 0, 0, 0, 0};
 
+    /** 各规则类型的缺失计数数组 */
     private static final int[] MISS_COUNT = {0, 0, 0, 0, 0, 0, 0, 0};
 
+    /**
+     * 执行Action逻辑
+     * 遍历项目中的所有Java文件，分析日志记录情况，并显示分析结果
+     * 
+     * @param e Action事件
+     */
     @Override
     public void actionPerformed(AnActionEvent e) {
         this.project = e.getProject();
 
         Objects.requireNonNull(project);
+        // 获取项目的所有源代码根目录
         VirtualFile[] vFiles = ProjectRootManager.getInstance(project).getContentSourceRoots();
         StringBuilder builder = new StringBuilder();
+        // 递归遍历所有Java文件并进行分析
         for (VirtualFile vFile : vFiles) {
             VfsUtilCore.visitChildrenRecursively(vFile, new VirtualFileVisitor<Object>() {
                 @Override
@@ -86,18 +116,30 @@ public class AnalyzeAction extends AnAction {
         Messages.showInfoMessage(builder.toString(), "Log Analysis Result");
     }
 
+    /**
+     * 分析PSI文件
+     * 使用访问者模式遍历AST，检查各种关键位置的日志记录情况
+     * 
+     * @param psiFile 要分析的PSI文件
+     */
     private void analyze(PsiFile psiFile) {
         psiFile.accept(new JavaRecursiveElementWalkingVisitor() {
 
+            /**
+             * 访问类定义
+             * 检查关键类中的方法是否需要记录日志
+             */
             @Override
             public void visitClass(PsiClass aClass) {
                 super.visitClass(aClass);
+                // 只处理顶级类，忽略内部类
                 if (!(aClass.getParent() instanceof PsiJavaFile)) {
                     return;
                 }
 
                 String line = "";
                 try {
+                    // 读取关键类配置，检查当前类是否匹配
                     BufferedReader bufferedReader = new BufferedReader(new FileReader(criticalClassesFile));
                     line = bufferedReader.readLine();
                     while (line != null) {
@@ -105,6 +147,7 @@ public class AnalyzeAction extends AnAction {
                         if (Pattern.matches(line, currentClassWholeName)) {
                             //get all method
                             PsiMethod[] methods = aClass.getMethods();
+                            // 检查类中所有非main方法是否需要记录日志
                             for (PsiMethod method : methods) {
                                 if (!method.getName().equals("main")) {
                                     TOTAL_COUNT[RULE_CRITICAL_CLASSES_AND_METHODS]++;
@@ -122,12 +165,17 @@ public class AnalyzeAction extends AnAction {
                 }
             }
 
+            /**
+             * 访问方法定义
+             * 检查关键方法是否需要记录日志
+             */
             @Override
             public void visitMethod(PsiMethod method) {
                 super.visitMethod(method);
                 String line = "";
                 final PsiClass currentFileClass = PsiTreeUtil.getParentOfType(method, PsiClass.class);
                 try {
+                    // 读取关键方法配置，检查当前方法是否匹配
                     BufferedReader bufferedReader = new BufferedReader(new FileReader(criticalMethodsFile));
                     line = bufferedReader.readLine();
                     while (line != null) {
@@ -148,15 +196,24 @@ public class AnalyzeAction extends AnAction {
 
             }
 
+            /**
+             * 访问断言语句
+             * 检查断言是否有描述信息
+             */
             @Override
             public void visitAssertStatement(PsiAssertStatement statement) {
                 super.visitAssertStatement(statement);
                 TOTAL_COUNT[RULE_ASSERT]++;
+                // 如果断言没有描述信息，则计入缺失计数
                 if (statement.getAssertDescription() == null) {
                     MISS_COUNT[RULE_ASSERT]++;
                 }
             }
 
+            /**
+             * 访问if语句
+             * 检查if-else分支中是否都有日志记录
+             */
             @Override
             public void visitIfStatement(PsiIfStatement statement) {
                 super.visitIfStatement(statement);
@@ -169,28 +226,36 @@ public class AnalyzeAction extends AnAction {
 
                 //获取else分支
                 PsiStatement elsebranch = statement.getElseBranch();
+                // 只处理完整的if-else语句
                 if (expression == null || thenbranch == null || elsebranch == null) {
                     return;
                 }
 
                 TOTAL_COUNT[RULE_CRITICAL_BRANCH]++;
                 boolean isThenRepeated, isElseRepeated = false;
+                // 检查then分支是否有日志记录
                 if (thenbranch instanceof PsiBlockStatement) {
                     isThenRepeated = findRepeatStatement(((PsiBlockStatement) thenbranch).getCodeBlock().getStatements());
                 } else {
                     isThenRepeated = findRepeatStatement(thenbranch);
                 }
+                // 检查else分支是否有日志记录
                 if (elsebranch instanceof PsiBlockStatement) {
                     isElseRepeated = findRepeatStatement(((PsiBlockStatement) elsebranch).getCodeBlock().getStatements());
                 } else {
                     isElseRepeated = findRepeatStatement(elsebranch);
                 }
 
+                // 如果then或else分支缺少日志记录，计入缺失计数
                 if (!isThenRepeated || !isElseRepeated) {
                     MISS_COUNT[RULE_CRITICAL_BRANCH]++;
                 }
             }
 
+            /**
+             * 访问switch语句
+             * 检查switch语句中是否有日志记录
+             */
             @Override
             public void visitSwitchStatement(PsiSwitchStatement psiSwitchStatement) {
 
@@ -225,6 +290,10 @@ public class AnalyzeAction extends AnAction {
 
             }
 
+            /**
+             * 访问catch块
+             * 检查异常捕获块中是否有日志记录
+             */
             @Override
             public void visitCatchSection(PsiCatchSection section) {
                 super.visitCatchSection(section);
@@ -241,6 +310,7 @@ public class AnalyzeAction extends AnAction {
                             PsiExpression expression = ((PsiExpressionStatement) psiStatement).getExpression();
                             if (expression instanceof PsiMethodCallExpression) {
                                 TOTAL_COUNT[RULE_EXCEPTION]++;
+                                // 如果找到log语句，则不计入缺失
                                 if (((PsiMethodCallExpression) expression).getMethodExpression().getQualifierExpression() != null
                                         && ((PsiMethodCallExpression) expression).getMethodExpression().getQualifierExpression().getText().equals("log")) {
                                     return;
@@ -253,6 +323,10 @@ public class AnalyzeAction extends AnAction {
 
             }
 
+            /**
+             * 访问方法调用表达式
+             * 检查线程相关操作（start、join、run）是否有日志记录
+             */
             @Override
             public void visitMethodCallExpression(PsiMethodCallExpression expression) {
                 super.visitCallExpression(expression);
@@ -262,6 +336,7 @@ public class AnalyzeAction extends AnAction {
                 final PsiReferenceExpression methodExpression = expression.getMethodExpression();
                 final String methodName = methodExpression.getReferenceName();
                 //check method name
+                // 检查Thread的start和join方法
                 if (methodName != null && (methodName.equals("start") || methodName.equals("join"))) {
                     //check call class type
                     if (isThread(expression)) {
@@ -272,6 +347,7 @@ public class AnalyzeAction extends AnAction {
                         }
                     }
                 } else if (methodName != null && methodName.equals("run")) {
+                    // 检查Thread子类的run方法
                     final PsiMethod method = expression.resolveMethod();
                     if (method == null) {
                         return;
@@ -292,6 +368,10 @@ public class AnalyzeAction extends AnAction {
                 }
             }
 
+            /**
+             * 访问赋值表达式
+             * 检查数据库连接获取操作（DriverManager.getConnection）是否有日志记录
+             */
             @Override
             public void visitAssignmentExpression(PsiAssignmentExpression expression) {
                 super.visitAssignmentExpression(expression);
@@ -306,11 +386,13 @@ public class AnalyzeAction extends AnAction {
                             final PsiMethodCallExpression rGetConn = (PsiMethodCallExpression) expression.getRExpression();
 
                             //check left
+                            // 检查是否为Connection类型的赋值
                             if (lConn != null && lConn.getType().toString().equals("PsiType:Connection")) {
                                 final PsiReferenceExpression methodExpression = rGetConn.getMethodExpression();
                                 final String methodName = methodExpression.getReferenceName();
                                 //check right
                                 //check method name
+                                // 检查是否为DriverManager.getConnection调用
                                 if (methodName != null && methodName.equals("getConnection")) {
                                     //check call class
                                     final PsiMethod method = rGetConn.resolveMethod();
@@ -335,7 +417,10 @@ public class AnalyzeAction extends AnAction {
                 }
             }
 
-            //2. check execute
+            /**
+             * 访问声明语句
+             * 检查数据库操作（executeQuery、execute、executeUpdate）是否有日志记录
+             */
             @Override
             public void visitDeclarationStatement(PsiDeclarationStatement statement) {
                 super.visitDeclarationStatement(statement);
@@ -352,6 +437,7 @@ public class AnalyzeAction extends AnAction {
 
                             /**
                              * 判断条件前后改变解决了bug
+                             * 检查executeQuery调用（返回ResultSet）
                              */
                             if (initializer instanceof PsiMethodCallExpression && initializer.getType() != null && initializer.getType().toString().equals("PsiType:ResultSet")) {
                                 final PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) initializer;
@@ -368,7 +454,9 @@ public class AnalyzeAction extends AnAction {
                                         }
                                     }
                                 }
-                            } else if (initializer instanceof PsiMethodCallExpression && initializer.getType() != null && initializer.getType().toString().equals("PsiType:boolean")) {
+                            } 
+                            // 检查execute调用（返回boolean）
+                            else if (initializer instanceof PsiMethodCallExpression && initializer.getType() != null && initializer.getType().toString().equals("PsiType:boolean")) {
                                 final PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) initializer;
                                 final PsiReferenceExpression queryMethodExpression = methodCallExpression.getMethodExpression();
                                 final String queryMethodName = queryMethodExpression.getReferenceName();
@@ -383,7 +471,9 @@ public class AnalyzeAction extends AnAction {
                                         }
                                     }
                                 }
-                            } else if (initializer instanceof PsiMethodCallExpression && initializer.getType() != null && initializer.getType().toString().equals("PsiType:int")) {
+                            } 
+                            // 检查executeUpdate调用（返回int）
+                            else if (initializer instanceof PsiMethodCallExpression && initializer.getType() != null && initializer.getType().toString().equals("PsiType:int")) {
                                 final PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) initializer;
                                 final PsiReferenceExpression queryMethodExpression = methodCallExpression.getMethodExpression();
                                 final String queryMethodName = queryMethodExpression.getReferenceName();
@@ -404,7 +494,13 @@ public class AnalyzeAction extends AnAction {
                 }
             }
 
-            //查重复
+            /**
+             * 查找重复语句（检查是否有日志记录）
+             * 在给定的语句数组中查找是否存在log语句
+             * 
+             * @param psiStatements 要检查的语句数组
+             * @return 如果找到log语句返回true，否则返回false
+             */
             private boolean findRepeatStatement(PsiStatement... psiStatements) {
                 if (psiStatements.length != 0) {
                     for (PsiStatement psiStatement : psiStatements) {
@@ -422,10 +518,22 @@ public class AnalyzeAction extends AnAction {
                 return false;
             }
 
+            /**
+             * 判断表达式是否为null字面量
+             * 
+             * @param expr 要检查的表达式
+             * @return 如果是null字面量返回true，否则返回false
+             */
             private boolean isNullLiteral(PsiExpression expr) {
                 return expr instanceof PsiLiteralExpression && "null".equals(expr.getText());
             }
 
+            /**
+             * 判断方法调用表达式是否为Thread类的方法
+             * 
+             * @param expression 要检查的方法调用表达式
+             * @return 如果是Thread类的方法返回true，否则返回false
+             */
             private boolean isThread(PsiMethodCallExpression expression) {
                 final PsiMethod method = expression.resolveMethod();
                 boolean res = false;
@@ -440,25 +548,33 @@ public class AnalyzeAction extends AnAction {
                 return res;
             }
 
+            /**
+             * 判断方法是否需要记录日志
+             * 检查方法开头和所有return语句前是否有日志记录
+             * 
+             * @param method 要检查的方法
+             * @return 如果需要记录日志返回true，否则返回false
+             */
             private boolean isToLog(PsiMethod method) {
                 final PsiCodeBlock codeBlock = method.getBody();
                 final PsiStatement[] statements = codeBlock.getStatements();
                 if (statements.length == 0) return false;
-                //check first
+                //check first - 检查方法开头是否有日志
                 if (!statements[0].getText().startsWith("log.")) {
                     return true;
                 }
-                //check returns
+                //check returns - 检查所有return语句前是否有日志
                 boolean returnAllLogged = true;
                 PsiType returnType = method.getReturnType();
                 ;
+                // void方法不需要检查return语句
                 if (returnType == PsiType.VOID) {
                     return false;
                 }
 
                 PsiReturnStatement[] returnStatements = PsiUtil.findReturnStatements(method);
                 for (PsiReturnStatement returnStatement : returnStatements) {
-                    //check previous
+                    //check previous - 检查return语句前是否有日志
                     if (!returnStatement.getPrevSibling().getPrevSibling().getText().startsWith("log.")) {
                         returnAllLogged = false;
                     }
