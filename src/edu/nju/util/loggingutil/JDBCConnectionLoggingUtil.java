@@ -7,7 +7,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
-
+//日志工具：判断语句是否已打日志，获取类全名，根据日志框架类型输出对应级别字符串
 /**
  * Created by chentiange on 2018/5/6.
  */

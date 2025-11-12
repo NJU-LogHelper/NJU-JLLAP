@@ -25,7 +25,7 @@ public class LoggingUtil {
     public static String getCurrentClassWholeName(PsiClass psiClass){
         return psiClass.getQualifiedName();
     }
-
+//根据日志框架类型（0-JavaUtil,1-Log4j,2-Slf4j）返回对应的级别字符串
     public static String getLevelStringById(Object level, int typeId){
         String levelString = "";
         if (typeId == 0){
