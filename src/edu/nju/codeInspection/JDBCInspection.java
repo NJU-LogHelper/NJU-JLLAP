@@ -66,7 +66,15 @@ import java.util.List;
 
 
 /**
- * Created by chentiange on 2018/5/5.
+ * JDBCInspection 是一个 IntelliJ IDEA 的本地 Java 检查器（LocalInspectionTool）。
+ * 目的：检测未记录日志的 JDBC 操作并提供一组 quickfix 建议（不同日志框架与级别）。
+ *
+ * 主要检测点：
+ *  - 对 DriverManager.getConnection(...) 的赋值（Connection 获取）是否未记录日志；
+ *  - 对 Statement.executeQuery/execute/executeUpdate 的调用（ResultSet/boolean/int 初始化）是否未记录日志。
+ *
+ * 检测到的问题会使用 LevelSequenceUtil 提供的一系列 LocalQuickFix 进行修复建议，
+ * 并通过 LoggingUtil.isLogged(...) 跳过已记录的语句以避免重复报告。
  */
 public class JDBCInspection extends BaseJavaLocalInspectionTool {
 
@@ -133,25 +141,41 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
 
     private static final String DESCRIPTION_TEMPLATE = "inspection.JDBC.descriptor";
 
+    /**
+     * 返回该检查器在设置或 UI 中显示的名称。
+     */
     @NotNull
     public String getDisplayName() {
 
         return "JDBC connection should be logged";
     }
 
+    /**
+     * 返回该检查器所属的分组显示名称（这里使用 IntelliJ 的日志分组）。
+     */
     @NotNull
     public String getGroupDisplayName() {
         return GroupNames.LOGGING_GROUP_NAME;
     }
 
     //对应的html
+    /**
+     * 检查器的短名称，用于配置标识与 HTML 描述中使用。
+     */
     @NotNull
     public String getShortName() {
         return "JDBCLogging";
     }
 
-
-
+    /**
+     * 构建用于遍历 PSI 树的 visitor。
+     *
+     * 覆盖的主要方法：
+     *  - visitAssignmentExpression: 检查 Connection 赋值（DriverManager.getConnection）
+     *  - visitDeclarationStatement: 检查 Statement.executeQuery / execute / executeUpdate 的使用
+     *
+     * 在匹配到未记录的 JDBC 操作时，使用 holder.registerProblem 注册问题并附带多个 quickfix 建议。
+     */
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
