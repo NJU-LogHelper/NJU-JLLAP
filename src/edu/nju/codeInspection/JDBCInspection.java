@@ -68,6 +68,17 @@ import java.util.List;
 /**
  * Created by chentiange on 2018/5/5.
  */
+
+/**
+ * JDBCInspection 是一个 IntelliJ 本地 Java 检查器，用于检测项目中未记录日志的 JDBC 操作。
+ *
+ * 主要检测点：
+ * - 对 java.sql.DriverManager.getConnection(...) 的赋值（Connection 获取）是否被记录；
+ * - 对 java.sql.Statement 的 executeQuery/execute/executeUpdate 调用（ResultSet/boolean/int 初始化）是否被记录；
+ *
+ * 当检测到未记录的 JDBC 操作时，该检查器会通过一组 LocalQuickFix 建议不同日志框架与级别的修复方案。
+ * 注意：仅添加注释，不改变逻辑。
+ */
 public class JDBCInspection extends BaseJavaLocalInspectionTool {
 
     private final LocalQuickFix jdbcConnectionJavaInfoQuickfix = new JDBCConnectionJavaInfoQuickfix();
@@ -133,25 +144,41 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
 
     private static final String DESCRIPTION_TEMPLATE = "inspection.JDBC.descriptor";
 
+    /**
+     * 返回在检查器设置/界面中显示的可读名称。
+     */
     @NotNull
     public String getDisplayName() {
 
         return "JDBC connection should be logged";
     }
 
+    /**
+     * 检查器所属分组（用于在 IntelliJ 检查设置中分类）。
+     */
     @NotNull
     public String getGroupDisplayName() {
         return GroupNames.LOGGING_GROUP_NAME;
     }
 
     //对应的html
+    /**
+     * 检查器的短名称（用于元数据和描述文件）。
+     */
     @NotNull
     public String getShortName() {
         return "JDBCLogging";
     }
 
-
-
+    /**
+     * 构建 PSI visitor，用于遍历 Java AST 并发现未记录的 JDBC 操作。
+     *
+     * 覆盖关键方法：
+     * - visitAssignmentExpression: 检测 DriverManager.getConnection 的赋值（Connection）
+     * - visitDeclarationStatement: 检测 Statement.executeQuery/execute/executeUpdate 的结果未被记录
+     *
+     * 对于每个发现的问题，会调用 holder.registerProblem(...) 并附带若干 quickfix。
+     */
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
@@ -165,9 +192,11 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
             @Override
             public void visitAssignmentExpression(PsiAssignmentExpression expression) {
                 super.visitAssignmentExpression(expression);
+                // 如果右侧是 null 字面量，则跳过检测
                 if(isNullLiteral(expression)){
                     return;
                 }
+                // 检测赋值操作符是否为 '='，并进一步检查是否为 DriverManager.getConnection 的调用并且未被记录
                 final IElementType opSign = expression.getOperationTokenType();
                 if (opSign == JavaTokenType.EQ){
                     final PsiExpression lConn = expression.getLExpression();
@@ -205,6 +234,11 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
                 if (statement == null){
                     return;
                 }
+                // 遍历声明的变量，检查初始化表达式：
+                // - ResultSet 类型且调用 executeQuery -> 标记为 "query" 需要记录
+                // - boolean 类型且调用 execute -> 标记为 "execute" 需要记录
+                // - int 类型且调用 executeUpdate -> 标记为 "update" 需要记录
+                // 使用 LoggingUtil.isLogged(...) 跳过已经记录的语句
                 for (PsiElement declaredElement:statement.getDeclaredElements()){
                     if (declaredElement instanceof PsiVariable){
                         PsiVariable variable = (PsiVariable) declaredElement;
@@ -276,11 +310,17 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
         };
     }
 
+    /**
+     * 判断表达式是否为 null 字面量。
+     */
     private static boolean isNullLiteral(PsiExpression expr) {
         return expr instanceof PsiLiteralExpression && "null".equals(expr.getText());
     }
 
 
+    /**
+     * 是否默认启用该检查器（IDE 中的开关默认值）。
+     */
     public boolean isEnabledByDefault() {
         return true;
     }
