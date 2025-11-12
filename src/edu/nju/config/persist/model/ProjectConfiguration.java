@@ -1,3 +1,4 @@
+// Project configuration class, managing default settings of log frameworks and supported log classes
 package edu.nju.config.persist.model;
 
 import com.intellij.openapi.components.*;
@@ -15,23 +16,24 @@ public class ProjectConfiguration {
     transient LogFrameworkDefaultsList logFrameworkDefaults = new LogFrameworkDefaultsList();
 
     public ProjectConfiguration() {
-        this.defaultFrameworkName="log4j-1.2";
-    }
-    public static ProjectConfiguration getInstance(){
-        return ServiceManager.getService(LogHelperProjectService.class).getProjectConfiguration();
+        this.defaultFrameworkName = "log4j-1.2"; // Default log framework name
     }
 
+    public static ProjectConfiguration getInstance() {
+        return ServiceManager.getService(LogHelperProjectService.class).getProjectConfiguration(); // Get project configuration instance
+    }
 
     public String getDefaultFrameworkName() {
         return defaultFrameworkName;
     }
 
     public void setDefaultFrameworkName(String defaultFrameworkName) {
-        if(defaultFrameworkName==null){
-            defaultFrameworkName="log4j-1.2";
+        if (defaultFrameworkName == null) {
+            defaultFrameworkName = "log4j-1.2";
         }
         this.defaultFrameworkName = defaultFrameworkName;
     }
+
     /**
      * Returns a set of supported logger class names.
      *
@@ -40,15 +42,19 @@ public class ProjectConfiguration {
     @NotNull
     public Set<String> getSupportedLoggerClasses() {
         Set<String> classes = new LinkedHashSet<>();
-        for(LogFrameworkDefaults logFrameworkDefaults:logFrameworkDefaults){
+        for (LogFrameworkDefaults logFrameworkDefaults : logFrameworkDefaults) {
             classes.add(logFrameworkDefaults.getLoggerClass());
         }
         return classes;
     }
+
     /**
-     * Returns true if the log configuration allows the usage of the named logger class.
-     * Note: The class of the logger doesn't necessarily need to be the same as the configured
-     * log default framework, for the case that reusing existing logger instances is enabled.
+     * Returns true if the log configuration allows the usage of the named logger
+     * class.
+     * Note: The class of the logger doesn't necessarily need to be the same as the
+     * configured
+     * log default framework, for the case that reusing existing logger instances is
+     * enabled.
      *
      * @param className The classname to look for.
      * @return True if the logger class is supported for usage.
@@ -57,18 +63,17 @@ public class ProjectConfiguration {
         return this.getSupportedLoggerClasses().contains(className);
     }
 
-
     /**
      * Returns the log framework for the given class if supported.
      *
      * @param loggerClassName The classname of the logger.
      * @param methodName      the method that was called.
      * @return the log framework for the given class if supported or 'null'
-     * if the logger is not backed by a supported framework.
+     *         if the logger is not backed by a supported framework.
      */
     public LogFramework getSupportedFrameworkForLoggerClass(final String loggerClassName, final String methodName) {
         LogFramework match = null;
-        LogFrameworkDefaultsList logFrameworkDefaultsList=new LogFrameworkDefaultsList();
+        LogFrameworkDefaultsList logFrameworkDefaultsList = new LogFrameworkDefaultsList();
         List<LogFramework> logFrameworkList = new ArrayList<>(logFrameworkDefaultsList);
         for (final LogFramework f : logFrameworkList) {
             if (f.getLoggerClass().equals(loggerClassName)) {
@@ -83,7 +88,7 @@ public class ProjectConfiguration {
         return match;
     }
 
-    public LogFrameworkDefaultsList getLogFrameworkDefaults(){
+    public LogFrameworkDefaultsList getLogFrameworkDefaults() {
         return logFrameworkDefaults;
     }
 
@@ -94,8 +99,8 @@ public class ProjectConfiguration {
      */
     @Nullable
     public LogFramework getDefaultLogFramework() {
-        for(LogFrameworkDefaults logFrameworkDefaults:logFrameworkDefaults){
-            if(defaultFrameworkName.equals(logFrameworkDefaults.getName())){
+        for (LogFrameworkDefaults logFrameworkDefaults : logFrameworkDefaults) {
+            if (defaultFrameworkName.equals(logFrameworkDefaults.getName())) {
                 return logFrameworkDefaults;
             }
         }

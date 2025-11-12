@@ -1,3 +1,4 @@
+// Log helper project service class, managing the persistence of project configurations
 package edu.nju.config.persist.service;
 
 import edu.nju.config.persist.model.ProjectConfiguration;
@@ -9,14 +10,14 @@ import com.intellij.openapi.components.*;
 )
 })
 public class LogHelperProjectService implements PersistentStateComponent<ProjectConfiguration> {
-    private ProjectConfiguration projectConfiguration=new ProjectConfiguration();
+    private ProjectConfiguration projectConfiguration=new ProjectConfiguration(); // Project configuration instance
 
     private LogHelperProjectService() {
-
-
+        // Private constructor to prevent direct instantiation
     }
+
     public static LogHelperProjectService getInstance(){
-        return ServiceManager.getService(LogHelperProjectService.class);
+        return ServiceManager.getService(LogHelperProjectService.class); // Get service instance
     }
 
     public ProjectConfiguration getState() {
