@@ -66,15 +66,18 @@ import java.util.List;
 
 
 /**
- * JDBCInspection 是一个 IntelliJ IDEA 的本地 Java 检查器（LocalInspectionTool）。
- * 目的：检测未记录日志的 JDBC 操作并提供一组 quickfix 建议（不同日志框架与级别）。
+ * Created by chentiange on 2018/5/5.
+ */
+
+/**
+ * JDBCInspection 是一个 IntelliJ 本地 Java 检查器，用于检测项目中未记录日志的 JDBC 操作。
  *
  * 主要检测点：
- *  - 对 DriverManager.getConnection(...) 的赋值（Connection 获取）是否未记录日志；
- *  - 对 Statement.executeQuery/execute/executeUpdate 的调用（ResultSet/boolean/int 初始化）是否未记录日志。
+ * - 对 java.sql.DriverManager.getConnection(...) 的赋值（Connection 获取）是否被记录；
+ * - 对 java.sql.Statement 的 executeQuery/execute/executeUpdate 调用（ResultSet/boolean/int 初始化）是否被记录；
  *
- * 检测到的问题会使用 LevelSequenceUtil 提供的一系列 LocalQuickFix 进行修复建议，
- * 并通过 LoggingUtil.isLogged(...) 跳过已记录的语句以避免重复报告。
+ * 当检测到未记录的 JDBC 操作时，该检查器会通过一组 LocalQuickFix 建议不同日志框架与级别的修复方案。
+ * 注意：仅添加注释，不改变逻辑。
  */
 public class JDBCInspection extends BaseJavaLocalInspectionTool {
 
@@ -142,7 +145,7 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
     private static final String DESCRIPTION_TEMPLATE = "inspection.JDBC.descriptor";
 
     /**
-     * 返回该检查器在设置或 UI 中显示的名称。
+     * 返回在检查器设置/界面中显示的可读名称。
      */
     @NotNull
     public String getDisplayName() {
@@ -151,7 +154,7 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
     }
 
     /**
-     * 返回该检查器所属的分组显示名称（这里使用 IntelliJ 的日志分组）。
+     * 检查器所属分组（用于在 IntelliJ 检查设置中分类）。
      */
     @NotNull
     public String getGroupDisplayName() {
@@ -160,7 +163,7 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
 
     //对应的html
     /**
-     * 检查器的短名称，用于配置标识与 HTML 描述中使用。
+     * 检查器的短名称（用于元数据和描述文件）。
      */
     @NotNull
     public String getShortName() {
@@ -168,13 +171,13 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
     }
 
     /**
-     * 构建用于遍历 PSI 树的 visitor。
+     * 构建 PSI visitor，用于遍历 Java AST 并发现未记录的 JDBC 操作。
      *
-     * 覆盖的主要方法：
-     *  - visitAssignmentExpression: 检查 Connection 赋值（DriverManager.getConnection）
-     *  - visitDeclarationStatement: 检查 Statement.executeQuery / execute / executeUpdate 的使用
+     * 覆盖关键方法：
+     * - visitAssignmentExpression: 检测 DriverManager.getConnection 的赋值（Connection）
+     * - visitDeclarationStatement: 检测 Statement.executeQuery/execute/executeUpdate 的结果未被记录
      *
-     * 在匹配到未记录的 JDBC 操作时，使用 holder.registerProblem 注册问题并附带多个 quickfix 建议。
+     * 对于每个发现的问题，会调用 holder.registerProblem(...) 并附带若干 quickfix。
      */
     @NotNull
     @Override
@@ -189,9 +192,11 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
             @Override
             public void visitAssignmentExpression(PsiAssignmentExpression expression) {
                 super.visitAssignmentExpression(expression);
+                // 如果右侧是 null 字面量，则跳过检测
                 if(isNullLiteral(expression)){
                     return;
                 }
+                // 检测赋值操作符是否为 '='，并进一步检查是否为 DriverManager.getConnection 的调用并且未被记录
                 final IElementType opSign = expression.getOperationTokenType();
                 if (opSign == JavaTokenType.EQ){
                     final PsiExpression lConn = expression.getLExpression();
@@ -229,6 +234,11 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
                 if (statement == null){
                     return;
                 }
+                // 遍历声明的变量，检查初始化表达式：
+                // - ResultSet 类型且调用 executeQuery -> 标记为 "query" 需要记录
+                // - boolean 类型且调用 execute -> 标记为 "execute" 需要记录
+                // - int 类型且调用 executeUpdate -> 标记为 "update" 需要记录
+                // 使用 LoggingUtil.isLogged(...) 跳过已经记录的语句
                 for (PsiElement declaredElement:statement.getDeclaredElements()){
                     if (declaredElement instanceof PsiVariable){
                         PsiVariable variable = (PsiVariable) declaredElement;
@@ -300,11 +310,17 @@ public class JDBCInspection extends BaseJavaLocalInspectionTool {
         };
     }
 
+    /**
+     * 判断表达式是否为 null 字面量。
+     */
     private static boolean isNullLiteral(PsiExpression expr) {
         return expr instanceof PsiLiteralExpression && "null".equals(expr.getText());
     }
 
 
+    /**
+     * 是否默认启用该检查器（IDE 中的开关默认值）。
+     */
     public boolean isEnabledByDefault() {
         return true;
     }
